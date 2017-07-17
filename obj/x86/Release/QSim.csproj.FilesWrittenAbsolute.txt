@@ -1,0 +1,4 @@
+/Users/Camille/Projects/QSim/QSim/obj/x86/Release/.NETFramework,Version=v4.5.AssemblyAttribute.cs
+/Users/Camille/Projects/QSim/QSim/bin/Release/teams/Gryffindor.txt
+/Users/Camille/Projects/QSim/QSim/bin/Release/QSim.exe
+/Users/Camille/Projects/QSim/QSim/obj/x86/Release/QSim.exe
