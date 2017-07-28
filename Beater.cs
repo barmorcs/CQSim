@@ -9,7 +9,7 @@ namespace QSim
 		{
 			int thresh = 29;
 			int fail = 33;
-			int backbeat = 41;
+			int backbeat = 44;
 			int dopple = 46;
 
 			int Seed = (int)DateTime.Now.Ticks;
@@ -52,7 +52,7 @@ namespace QSim
 		public bool Defend(int help, Beater offender = null)
 		{
 			int fail = 33;
-			int newtarget = 44;
+			int newtarget = 40;
 			int Seed = (int)DateTime.Now.Ticks;
 			Random rnd = new Random(Seed);
 
@@ -78,7 +78,7 @@ namespace QSim
 					}
 					else
 					{
-						this.Attack(Game.GetChaser(null, (this.GetKey().Substring(0, 2)), false));
+						this.Attack(Game.GetChaser(null, (this.GetKey().Substring(0, 2)), true));
 					}
 				}
 				return true;

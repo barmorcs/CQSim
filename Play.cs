@@ -20,6 +20,7 @@ namespace QSim
 		public static Chaser hasBall;
 		public static Seeker isChasing = null;
 		public static Seeker isFollowing = null;
+		public Foul Fouler = new Foul();
 
 		public static bool snitchCaught = false;
 		public static bool chasing = false;
@@ -54,20 +55,16 @@ namespace QSim
 			int Seed = (int)DateTime.Now.Ticks;
 			Random rnd = new Random(Seed);
 
-			int passcount = 0;
 			Keeper keeper = GetKeeper(hasBall);
 
 			Chaser nextChaser = GetChaser(hasBall);
 			if (pass > 3 || (pass > 2 && hasBall.IsLead()))
 			{
-				if (!hasBall.Shoot(keeper))
-					Score(hasBall, 10);
+				hasBall.Shoot(keeper);
 			}
 			else if (hasBall.Pass(nextChaser))
 			{
-				if (rnd.Next(1, 3) > 1 || passcount > 2)
-					pass = pass + 1;
-				passcount += 1;
+				pass += 1;
 				ChaserPlay(nextChaser, pass);
 			}
 		}
@@ -201,7 +198,7 @@ namespace QSim
 		}
 
 		//gets opposite Keeper by default
-		public Keeper GetKeeper(Chaser chaser, bool oppose = false)
+		public Keeper GetKeeper(Player chaser, bool oppose = false)
 		{
 			string team = "";
 			bool flip = oppose;
@@ -284,7 +281,9 @@ namespace QSim
 
 		}
 
-		public bool GoalInterrupt(Keeper keeper)
+		//returns false if goal is NOT interrupted
+		//returns true if goal is interrupted
+		public bool GoalInterrupt(Chaser chase, Keeper keeper)
 		{
 			int Seed = (int)DateTime.Now.Ticks;
 			Random rnd = new Random(Seed);
@@ -293,14 +292,31 @@ namespace QSim
 			if (chance == 1)//friendly chaser comes to help
 			{
 				Chaser defendingChaser = GetChaser(null, keeper.GetKey().Substring(0, 2), false);
-				return defendingChaser.DefendGoal();
+				return defendingChaser.DefendGoal(chase);
 			}
-			if (chance == 2)//opposing beater comes to help
+			if (chance == 2 || chance == 3)//opposing beater comes to help
 			{
+				if (GetBeater(keeper).Attack(keeper))
+				{
+					System.Console.WriteLine(keeper.Name() + " failed to block the goal!");
+                    Score(chase, 10);
+					return true;
+				}else 
 				return false;
 			}
-			if (chance == 3)//opposing chaser fouls
+			if (chance == 4)//opposing chaser fouls
 			{
+				Chaser opposingChaser = GetChaser(null, keeper.GetKey().Substring(0, 2), true);
+				if (opposingChaser.PlaysDirty() && Fouler.FoulVersus(opposingChaser, keeper, "stoog"))
+				{
+					SetBaller();
+					if (!Referee(opposingChaser, keeper))
+					{
+						System.Console.WriteLine(keeper.Name() + " failed to block the goal!");
+						Score(chase, 10);
+					}
+					return true;
+				}
 				return false;
 			}
 			return false;
@@ -312,24 +328,84 @@ namespace QSim
 		{
 			int Seed = (int)DateTime.Now.Ticks;
 			Random rnd = new Random(Seed);
-			int chance = rnd.Next(15);
+			int chance = rnd.Next(22);
 
-			if (chance == 1)//chaser interrupt
+			if (chance < 3)//chaser interrupt
 			{
 				Chaser opposingChaser = GetChaser(null, chase.GetKey().Substring(0, 2), true);
 				return opposingChaser.Interception(chase);
 			}
-			if (chance == 2 || chance == 3)//beater interrupt
+			if (chance >= 3 && chance < 6)//beater interrupt
 			{
 				return GetBeater(chase).Attack(chase);
+			}
+			if (chance >= 6 && chance < 8)//opposing chaser fouls
+			{
+				Chaser opposingChaser = GetChaser(null, chase.GetKey().Substring(0, 2), true);
+				if (opposingChaser.PlaysDirty() && Fouler.FoulVersus(opposingChaser, chase))
+				{
+					SetBaller();
+					Referee(opposingChaser, chase);
+					return true;
+				}
+				return false;
+			}
+			if (chance == 9)//opposing beaters foul
+			{
+				Beater beater = GetBeater(chase);
+				if (beater.PlaysDirty() && Fouler.FoulVersus(beater, chase))
+				{
+					SetBaller();
+					Referee(beater, chase);
+					return true;
+				}
+				return false;
 			}
 			return false;
 		}
 
-		public bool ChaserInterrupt(Chaser victim)
+		//returns false if play is NOT interrupted
+		//returns true if play is interrupted
+		public bool SeekInterrupt(Seeker seek)
 		{
-			//interception
-			//foul
+			int Seed = (int)DateTime.Now.Ticks;
+			Random rnd = new Random(Seed);
+			int chance = rnd.Next(25);
+
+			if (chance < 3)//seekers foul
+			{
+				Seeker fouler = GetSeeker(seek);
+				if (fouler.PlaysDirty() && Fouler.FoulVersus(fouler, seek))
+				{
+					Referee(fouler, seek);
+					return true;
+				}
+				return false;
+			}
+			if (chance >= 3 && chance < 6)//beater interrupt
+			{
+				return GetBeater(seek).Attack(seek);
+			}
+			if (chance >= 6 && chance < 8)//opposing chaser fouls
+			{
+				Chaser opposingChaser = GetChaser(null, seek.GetKey().Substring(0, 2), true);
+				if (opposingChaser.PlaysDirty() && Fouler.FoulVersus(opposingChaser, seek))
+				{
+					Referee(opposingChaser, seek);
+					return true;
+				}
+				return false;
+			}
+			if (chance == 9)//opposing beaters foul
+			{
+				Beater beater = GetBeater(seek);
+				if (beater.PlaysDirty() && Fouler.FoulVersus(beater, seek))
+				{
+					Referee(beater, seek);
+					return true;
+				}
+				return false;
+			}
 			return false;
 		}
 
@@ -380,13 +456,41 @@ namespace QSim
 			if (!chasing) seekCount = 0;
 		}
 
+		//returns true if foul is caught
+		public bool Referee(Player offender, Player victim)
+		{
+			int Seed = (int)DateTime.Now.Ticks;
+			Random rnd = new Random(Seed);
+			int chance = rnd.Next(2);
+			Chaser shooter;
+
+			if (chance > 0)
+			{
+				System.Console.WriteLine("Referee has called a foul on " + offender.Name() + "!");
+				Keeper keeper = GetKeeper(victim);
+
+				if (victim.GetKey().Contains("C"))
+				{
+					shooter = victim as Chaser;
+				}
+				else
+				{
+					shooter = GetChaser(null, victim.GetKey().Substring(0, 2));
+				}
+				shooter.ShootPenalty(keeper);
+				return true;
+			}
+			else return false;
+		}
+
 		public void SeekerChance()
 		{
 			int Seed = (int)DateTime.Now.Ticks;
 			Random rnd = new Random(Seed);
-			int seekChance = rnd.Next(5);
+			int seekChance = rnd.Next(7);
 			bool ready = CompareCounts();
 			bool head = HeadToHeadCount();
+			int foulChance = rnd.Next(4);
 
 			if (seekChance == 0 && !chasing)
 			{
@@ -398,6 +502,36 @@ namespace QSim
 			{
 				Seeker two = GetSeeker(isChasing);
 				SecondSight(two);
+			}
+
+			//if seeking play is interrupted, one and two are flipped
+			if (chasing && chasing2 && foulChance == 0)
+			{
+				if (SeekInterrupt(isChasing))
+				{
+					isChasing.LostSnitch();
+					chasing2 = false;
+					isChasing = isFollowing;
+				}
+			}
+
+			if (chasing && !chasing2 && foulChance == 1)
+			{
+				if (SeekInterrupt(isChasing))
+				{
+					isChasing.LostSnitch();
+					chasing = false;
+					catchAttempts = 0;
+				}
+			}
+
+			if ((chasing2) && foulChance == 3)
+			{
+				if (SeekInterrupt(isFollowing))
+				{
+					isFollowing.LostSnitch();
+					chasing2 = false;
+				}
 			}
 
 			if (chasing && !chasing2 && ready)
@@ -441,7 +575,7 @@ namespace QSim
 					catchAttempts = 0;
 					chasing = false;
 					chasing2 = false;
-					heading = false; 
+					heading = false;
 				}
 				else
 				{
@@ -485,7 +619,7 @@ namespace QSim
 		//returns true if count is high enough for Seekers to go head to head
 		public bool HeadToHeadCount()
 		{
-			if (seekCount > 12)
+			if (seekCount > 11)
 			{
 				return true;
 			}

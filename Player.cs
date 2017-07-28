@@ -115,6 +115,16 @@ namespace QSim
 			return key;
 		}
 
+		public bool IsLead()
+		{
+			return lead;
+		}
+
+		public bool IsKnockedOut()
+		{
+			return knockedOut;
+		}
+
 		public bool Foul()
 		{
 			return true;
@@ -125,31 +135,26 @@ namespace QSim
 			return true;
 		}
 
-		public bool IsLead()
-		{
-			return lead;
-		}
-		public bool IsKnockedOut()
-		{
-			return knockedOut;
-		}
-
 		// accepts a positive integer that is how strong the hit was
 		// returns true if bludger was avoided
 		// returns false if player was hit
 		public bool AvoidBludger(int help = 0)
 		{
-			int threshold = 10;
+			int threshold = 21;
 			int sloth = 28;
 
 			int Seed = (int)DateTime.Now.Ticks;
 			Random rnd = new Random(Seed);
 
 			int roll = rnd.Next(0, 11);
-			int check = roll + this.Speed() + this.Reflex() - help;
-			if (check < threshold)
+			int damage = rnd.Next(3, 9);
+			int check = roll + this.Speed() + this.Reflex() + this.Strength() - help;
+			if (check < threshold || roll == 0)
 			{
-				int loss = (help/2) + check  + 1;
+				int loss = (help / 2) + damage;
+				if (loss < 1)
+					loss = 4;
+
 				hp = hp - loss;
 
 				if (hp <= 0)
@@ -165,27 +170,7 @@ namespace QSim
 
 				System.Console.WriteLine(this.Name() + " was hit by a Bludger! Lost " + loss + " HP, "
 										 + this.Health() + " remaining");
-				if (hp <= 2)
-				{
-					reflex = reflex - 2;
-					sight = sight - 2;
-					aim = aim - 2;
-					strength = strength - 2;
-					speed = speed - 3;
-				}
-				else if (hp <= 5)
-				{
-					reflex--;
-					sight--;
-					aim--;
-					strength--;
-					speed--;
-				}
-				else if (hp <= 8)
-				{
-					strength--;
-					speed--;
-				}
+                this.UpdateStats();
 				if (this.GetKey().Contains("C"))
 					Game.SetBaller();
 
@@ -213,6 +198,41 @@ namespace QSim
 			hp = 15;
 			knockedOut = false;
 			System.Console.WriteLine(this.Name() + " has been revived and returned to the game!");
+		}
+
+		public void Hurt(int hurt)
+		{
+			hp = hp - hurt;
+
+			if (hp <= 0)
+			{
+				System.Console.WriteLine(this.Name() + " was knocked out!");
+				this.knockedOut = true;
+				if (this.GetKey().Contains("C")) Game.SetBaller();
+				Game.KnockOut(this);
+			}
+			else
+			{
+				System.Console.WriteLine(this.Name() + " lost " + hurt + " HP, " + this.Health() + " remaining");
+				this.UpdateStats();
+			}
+		}
+
+		public void UpdateStats()
+		{
+			if (hp <= 5)
+			{
+				reflex--;
+				sight--;
+				aim--;
+				strength--;
+				speed--;
+			}
+			else if (hp <= 8)
+			{
+				strength--;
+				speed--;
+			}
 		}
 	}
 }

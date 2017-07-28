@@ -31,11 +31,16 @@ namespace QSim
 		public bool Catch()
 		{
 			int snatch = 30;
+			int spiral = 36;
 			int Seed = (int)DateTime.Now.Ticks;
 			Random rnd = new Random(Seed);
 			int roll = rnd.Next(0, 11);
 			int check = roll + this.Sight() + this.Reflex() + this.Speed();
 
+			if (check > spiral)
+			{
+				System.Console.WriteLine(this.Name() + " goes into a Spiral Dive!");
+			}
 			if (check > snatch)
 			{
 				System.Console.WriteLine(this.Name() + " caught the Snitch!");

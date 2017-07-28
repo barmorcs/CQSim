@@ -74,52 +74,94 @@ namespace QSim
 			return true;
 		}
 
-		public bool Shoot(Keeper keeper, int bonus = 0)
+		public void Shoot(Keeper keeper, int bonus = 0)
 		{
-			int fail = 17;
-			int threshold = 20;
-			int special = 33;
-			int flick = 36;
+			int fail = 20;
+			int threshold = 23;
+			int special = 32;
+			int flick = 35;
+			int havercheck = 18;
 
 			int Seed = (int)DateTime.Now.Ticks;
 			Random rnd = new Random(Seed);
 			int roll = rnd.Next(0, 11);
 			int check = roll + this.Aim() + this.Strength() + this.Sight() + this.Size() + bonus;
+			int haversack = roll + this.Aim() + this.Strength() + this.Speed() + this.Size() + bonus;
 
 			Chaser next = Game.GetChaser(null, keeper.GetKey().Substring(0, 2));
 			Game.SetBaller(next);
 
-			if (check < fail)//crit fail!
+			if (this.PlaysDirty() && rnd.Next(0, 8) == 1 && haversack > havercheck)
 			{
-				System.Console.WriteLine(this.Name() + " attempted to shoot goal and missed");
-				return false;
+				System.Console.WriteLine(this.Name() + " haversacked the Quaffle into the hoop");
+				if (Game.Referee(this, keeper) == false)
+				{
+					Game.Score(this, 10);
+				}
 			}
-			if (check > flick)
+			else if (check < fail)
+			{
+				System.Console.WriteLine(this.Name() + " attempted to shoot a goal and missed");
+			}
+			else if (check > flick)
 			{
 				System.Console.Write(this.Name() + " hit the Quaffle towards the goalposts with a Finbourgh Flick!");
-				return (keeper.DefendGoal(flick - check));
+				if (!Game.GoalInterrupt(this,keeper) && !keeper.DefendGoal(this, check - threshold)) 
+					Game.Score(this, 10);
+                    
 			}
 			else if (check > special && this.Aim() > this.Strength())
 			{
 				System.Console.WriteLine(this.Name() + " aimed a Dionysus Dive!");
-				return (keeper.DefendGoal(special - check));
+				if (!Game.GoalInterrupt(this,keeper) && !keeper.DefendGoal(this, check - threshold)) 
+					Game.Score(this, 10);
 			}
 			else if (check > special)
 			{
 				System.Console.WriteLine(this.Name() + " aimed a Chelmondiston Charge!");
-				return (keeper.DefendGoal(special - check));
+				if (!Game.GoalInterrupt(this,keeper) && !keeper.DefendGoal(this, check - threshold)) 
+					Game.Score(this, 10);
 			}
 			else if (check > threshold)
 			{
 				System.Console.WriteLine(this.Name() + " attempted to shoot a goal");
-				return (keeper.DefendGoal(threshold - check));
+				if (!Game.GoalInterrupt(this,keeper) && !keeper.DefendGoal(this, check - threshold)) 
+					Game.Score(this, 10);
 			}
 			else if (check > fail)
 			{
-				System.Console.WriteLine(this.Name() + " attempted to shoot a goal");
-				return (keeper.DefendGoal(check - threshold));
+				System.Console.WriteLine(this.Name() + " aimed a wild shot towards the goalposts");
+				if (!Game.GoalInterrupt(this,keeper) && !keeper.DefendGoal(this, check - threshold)) 
+					Game.Score(this, 10);
 			}
-			return false;
+		}
+
+		public void ShootPenalty(Keeper keeper)
+		{
+			int fail = 17;
+			int threshold = 21;
+
+			int Seed = (int)DateTime.Now.Ticks;
+			Random rnd = new Random(Seed);
+			int roll = rnd.Next(0, 11);
+			int check = roll + this.Aim() + this.Strength() + this.Sight() + this.Size();
+
+			if (check < fail)
+			{
+				System.Console.WriteLine(this.Name() + " attempted to shoot a penalty goal and missed");
+			}
+			if (check > threshold)
+			{
+				System.Console.WriteLine(this.Name() + " attempted to shoot a penalty goal");
+				if (!keeper.DefendGoal(this, check - threshold, true))
+					Game.Score(this, 10);
+			}
+			else if (check > fail)
+			{
+				System.Console.WriteLine(this.Name() + " aimed a wild shot towards the goalposts");
+				if (!keeper.DefendGoal(this, check - threshold, true))
+					Game.Score(this, 10);
+			}
 		}
 
 		//returns true if ball is intercepted
