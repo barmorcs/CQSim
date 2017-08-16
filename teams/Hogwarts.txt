@@ -1,0 +1,57 @@
+﻿Hogwarts
+Llewellyn Taaffe
+12
+7
+4
+8
+9
+1
+false
+Ingalill Nattochdag
+7
+9
+3
+9
+10
+1
+false
+Aureo Macias
+9
+7
+10
+5
+9
+1
+false
+Redding Fox
+8
+8
+7
+7
+9
+1
+true
+Joss Mulligan
+8
+5
+8
+6
+9
+1
+true
+Wesley Stuart
+9
+6
+9
+9
+9
+1
+false
+Andromeda Seaver
+9
+7
+8
+7
+8
+1
+true

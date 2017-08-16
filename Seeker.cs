@@ -7,10 +7,10 @@ namespace QSim
 
 		public bool Search(bool follow = false)
 		{
-			int search = 12;
+			int search = 18;
 			int Seed = (int)DateTime.Now.Ticks;
 			Random rnd = new Random(Seed);
-			int roll = rnd.Next(0, 11);
+			int roll = rnd.Next(1, 21);
 			int check = roll + this.Sight();
 			string also = "";
 
@@ -20,7 +20,7 @@ namespace QSim
 				search = 10;
 			}
 
-			if (check > search)
+			if (check > search && roll != 1)
 			{
 				System.Console.WriteLine(this.Name() + " has" + also + " seen the Snitch!");
 				return true;
@@ -30,18 +30,19 @@ namespace QSim
 
 		public bool Catch()
 		{
-			int snatch = 30;
-			int spiral = 36;
+			int snatch = 40;
+			int spiral = 46;
 			int Seed = (int)DateTime.Now.Ticks;
 			Random rnd = new Random(Seed);
-			int roll = rnd.Next(0, 11);
+			int roll = rnd.Next(1, 21);
+
 			int check = roll + this.Sight() + this.Reflex() + this.Speed();
 
-			if (check > spiral)
+			if (check > spiral && roll != 1)
 			{
 				System.Console.WriteLine(this.Name() + " goes into a Spiral Dive!");
 			}
-			if (check > snatch)
+			if (check > snatch && roll != 1)
 			{
 				System.Console.WriteLine(this.Name() + " caught the Snitch!");
 				Game.Score(this, 150);
@@ -53,15 +54,15 @@ namespace QSim
 
 		public bool HeadToHead(Seeker one, Seeker two)
 		{
-			int snatch = 30;
+			int snatch = 40;
 			int Seed = (int)DateTime.Now.Ticks;
 			Random rnd = new Random(Seed);
-			int roll = rnd.Next(0, 11);
-			int roll2 = rnd.Next(0, 11);
+			int roll = rnd.Next(1, 21);
+			int roll2 = rnd.Next(1, 21);
 			int checkOne = roll + one.Sight() + one.Reflex() + one.Speed();
 			int checkTwo = roll2 + two.Sight() + two.Reflex() + two.Speed();
 
-			if (checkOne < snatch && checkTwo < snatch)
+			if ((roll==1 && roll2==1) || (checkOne < snatch && checkTwo < snatch))
 			{
 				System.Console.WriteLine("Both Seekers reach for the Snitch and miss!");
 				return false;
@@ -73,17 +74,22 @@ namespace QSim
 				return false;
 			}
 
-			if (checkOne < checkTwo)
+			if (checkOne < checkTwo || roll == 1 || roll2==20)
 			{
 				System.Console.WriteLine(one.Name() + " caught the Snitch!");
 				Game.Score(one, 150);
 				return true;
 			}
-			else
+			else if (checkOne < checkTwo || roll2 == 1 || roll==20)
 			{
 				System.Console.WriteLine(two.Name() + " caught the Snitch!");
 				Game.Score(two, 150);
 				return true;
+			}
+			else
+			{
+				System.Console.WriteLine("Both Seekers reach for the Snitch and miss!");
+				return false;
 			}
 		}
 

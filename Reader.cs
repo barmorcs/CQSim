@@ -31,8 +31,8 @@ namespace QSim
 			Player T2B2 = new Beater();
 			Player T2S = new Seeker();
 
-			System.IO.StreamReader inTeam1 = new System.IO.StreamReader("/Users/Camille/Projects/QSim/QSim/teams/Gryffindor.txt");
-			System.IO.StreamReader inTeam2 = new System.IO.StreamReader("/Users/Camille/Projects/QSim/QSim/teams/Slytherin.txt");
+			System.IO.StreamReader inTeam1 = new System.IO.StreamReader("/Users/Camille/Projects/QSim/QSim/teams/Durmstrang.txt");
+			System.IO.StreamReader inTeam2 = new System.IO.StreamReader("/Users/Camille/Projects/QSim/QSim/teams/Hogwarts.txt");
 
 			team1 = inTeam1.ReadLine();
 			T1K.Setup(team1, inTeam1.ReadLine(), int.Parse(inTeam1.ReadLine()), int.Parse(inTeam1.ReadLine()), int.Parse(inTeam1.ReadLine()), int.Parse(inTeam1.ReadLine()), int.Parse(inTeam1.ReadLine()), int.Parse(inTeam1.ReadLine()), bool.Parse(inTeam1.ReadLine()), "T1K");

@@ -44,6 +44,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="teams\Slytherin.txt" />
+    <None Include="teams\Hogwarts.txt" />
+    <None Include="teams\Beauxbatons.txt" />
+    <None Include="teams\Durmstrang.txt" />
+    <None Include="teams\Ilvermorny.txt" />
+    <None Include="teams\Uagadou.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

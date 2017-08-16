@@ -140,18 +140,18 @@ namespace QSim
 		// returns false if player was hit
 		public bool AvoidBludger(int help = 0)
 		{
-			int threshold = 21;
-			int sloth = 28;
+			int threshold = 35;
+			int sloth = 45;
 
 			int Seed = (int)DateTime.Now.Ticks;
 			Random rnd = new Random(Seed);
 
-			int roll = rnd.Next(0, 11);
-			int damage = rnd.Next(3, 9);
+			int roll = rnd.Next(1, 21);
+			int damage = rnd.Next(3, 6);
 			int check = roll + this.Speed() + this.Reflex() + this.Strength() - help;
-			if (check < threshold || roll == 0)
+			if (check < threshold || roll == 1)
 			{
-				int loss = (help / 2) + damage;
+				int loss = (help/2) + damage;
 				if (loss < 1)
 					loss = 4;
 
@@ -163,6 +163,7 @@ namespace QSim
 					this.knockedOut = true;
 
 					if (this.GetKey().Contains("C")) Game.SetBaller();
+
 					Game.KnockOut(this);
 
 					return false;
@@ -176,7 +177,7 @@ namespace QSim
 
 				return false;
 			}
-			if (check > sloth)
+			if (check > sloth || roll==20)
 			{
 				System.Console.WriteLine(this.Name() + " dodged the Bludger with a Sloth Grip Roll");
 				return true;

@@ -1,0 +1,57 @@
+﻿Durmstrang
+Joakim Nattochdag
+10
+10
+8
+6
+10
+1
+true
+Sunny Gervais
+8
+10
+4
+9
+10
+1
+false
+Linnea Sorensen
+9
+7
+9
+7
+8
+1
+false
+Filip Haugen
+8
+6
+10
+7
+7
+1
+true
+Lukas Larsson
+8
+6
+9
+7
+8
+1
+true
+Thorfinn Havel
+8
+8
+9
+8
+9
+1
+false
+Sigrid Johannessen
+8
+6
+9
+8
+7
+1
+false

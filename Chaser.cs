@@ -7,19 +7,19 @@ namespace QSim
 		
 		public bool Pass(Chaser next)
 		{
-			int fail = 8;
-			int threshold = 11;
-			int reversePass = 29;
-			int ploy = 33;
+			int fail = 16;
+			int threshold = 20;
+			int reversePass = 38;
+			int ploy = 45;
 
 			int Seed = (int)DateTime.Now.Ticks;
 			Random rnd = new Random(Seed);
 
-			int roll = rnd.Next(0, 11);
+			int roll = rnd.Next(1, 21);
 			int check = roll + this.Aim() + this.Strength();
 			int help = check - threshold;
 
-			if (check < fail)//crit fail!
+			if (check < fail || roll==1)//crit fail!
 			{
 				System.Console.WriteLine(this.Name() + " tried to pass the Quaffle to " + next.Name() + " but missed");
 				Game.SetBaller();
@@ -54,9 +54,9 @@ namespace QSim
 		{
 			int Seed = (int)DateTime.Now.Ticks;
 			Random rnd = new Random(Seed);
-			int roll = rnd.Next(0, 11);
+			int roll = rnd.Next(1, 21);
 			int total = roll + help + this.Sight() + this.Reflex();
-			if (total < 8)//crit fail! or a regular fail
+			if (total < 15)//crit fail! or a regular fail
 			{
 				if (first) System.Console.WriteLine(this.Name() + " reached for the Quaffle and missed");
 				else if (help < 0) System.Console.WriteLine(" and " + this.Name() + " missed it");
@@ -76,15 +76,15 @@ namespace QSim
 
 		public void Shoot(Keeper keeper, int bonus = 0)
 		{
-			int fail = 20;
-			int threshold = 23;
-			int special = 32;
-			int flick = 35;
-			int havercheck = 18;
+			int fail = 28;
+			int threshold = 33;
+			int special = 42;
+			int flick = 45;
+			int havercheck = 28;
 
 			int Seed = (int)DateTime.Now.Ticks;
 			Random rnd = new Random(Seed);
-			int roll = rnd.Next(0, 11);
+			int roll = rnd.Next(1, 21);
 			int check = roll + this.Aim() + this.Strength() + this.Sight() + this.Size() + bonus;
 			int haversack = roll + this.Aim() + this.Strength() + this.Speed() + this.Size() + bonus;
 
@@ -99,13 +99,13 @@ namespace QSim
 					Game.Score(this, 10);
 				}
 			}
-			else if (check < fail)
+			else if (check < fail || roll ==1)
 			{
 				System.Console.WriteLine(this.Name() + " attempted to shoot a goal and missed");
 			}
 			else if (check > flick)
 			{
-				System.Console.Write(this.Name() + " hit the Quaffle towards the goalposts with a Finbourgh Flick!");
+				System.Console.WriteLine(this.Name() + " hit the Quaffle towards the goalposts with a Finbourgh Flick!");
 				if (!Game.GoalInterrupt(this,keeper) && !keeper.DefendGoal(this, check - threshold)) 
 					Game.Score(this, 10);
                     
@@ -122,7 +122,7 @@ namespace QSim
 				if (!Game.GoalInterrupt(this,keeper) && !keeper.DefendGoal(this, check - threshold)) 
 					Game.Score(this, 10);
 			}
-			else if (check > threshold)
+			else if (check > threshold || roll==20)
 			{
 				System.Console.WriteLine(this.Name() + " attempted to shoot a goal");
 				if (!Game.GoalInterrupt(this,keeper) && !keeper.DefendGoal(this, check - threshold)) 
@@ -138,19 +138,19 @@ namespace QSim
 
 		public void ShootPenalty(Keeper keeper)
 		{
-			int fail = 17;
-			int threshold = 21;
+			int fail = 25;
+			int threshold = 27;
 
 			int Seed = (int)DateTime.Now.Ticks;
 			Random rnd = new Random(Seed);
-			int roll = rnd.Next(0, 11);
+			int roll = rnd.Next(1, 21);
 			int check = roll + this.Aim() + this.Strength() + this.Sight() + this.Size();
 
-			if (check < fail)
+			if (check < fail || roll ==1)
 			{
 				System.Console.WriteLine(this.Name() + " attempted to shoot a penalty goal and missed");
 			}
-			if (check > threshold)
+			if (roll==20 || check > threshold)
 			{
 				System.Console.WriteLine(this.Name() + " attempted to shoot a penalty goal");
 				if (!keeper.DefendGoal(this, check - threshold, true))
@@ -169,12 +169,15 @@ namespace QSim
 		{
 			int Seed = (int)DateTime.Now.Ticks;
 			Random rnd = new Random(Seed);
-			int roll1 = rnd.Next(0, 11);
-			int roll2 = rnd.Next(0, 11);
+			int chance = rnd.Next(1, 10);
+			int roll1 = rnd.Next(1, 21);
+			int roll2 = rnd.Next(1, 21);
 			int interceptorCheck = roll1 + this.Sight() + this.Reflex() + this.Strength() + this.Size();
 			int victimCheck = roll2 + victim.Sight() + victim.Reflex() + victim.Strength() + this.Size();
 
-			if (interceptorCheck >= victimCheck)
+			if (chance < 6) return false;
+
+			if (interceptorCheck >= victimCheck || roll2==1 || roll1==20)
 			{
 				System.Console.WriteLine(this.Name() + " intercepted the Quaffle from " + victim.Name());
 				Game.SetBaller(this);

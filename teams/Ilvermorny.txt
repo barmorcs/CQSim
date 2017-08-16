@@ -1,0 +1,57 @@
+﻿Ilvermorny
+Zoe Trudeau
+9
+5
+6
+8
+7
+1
+false
+Dalisay Villanueva
+6
+9
+5
+10
+8
+1
+true
+Elijah Hayes
+9
+9
+7
+8
+12
+1
+false
+Dakila Villanueva
+9
+6
+10
+6
+8
+1
+false
+Dre Dawkins
+7
+9
+10
+8
+7
+1
+false
+Nora Harper
+11
+7
+10
+7
+10
+1
+true
+Artie Jefferson
+8
+6
+11
+8
+7
+1
+true

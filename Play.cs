@@ -219,7 +219,7 @@ namespace QSim
 		}
 
 		//gets opposite Beater by default
-		public Beater GetBeater(Player player, bool oppose = false)
+		public Beater GetBeater(Player player, bool oppose = false, bool getLead = false)
 		{
 			string team = "";
 			bool flip = oppose;
@@ -240,11 +240,12 @@ namespace QSim
 			{
 				team = player.GetKey().Substring(0, 2);
 
-				if (int.Parse(player.GetKey().Substring(3)) == 1)
+				if (player.GetKey().Substring(3) != "" && int.Parse(player.GetKey().Substring(3)) == 1)
 					return players[team + "B2"] as Beater;
 				return players[team + "B1"] as Beater;
 			}
 
+			if (getLead) swap = 1;
 			string key = team + "B" + swap;
 			return players[key] as Beater;
 		}
@@ -299,10 +300,11 @@ namespace QSim
 				if (GetBeater(keeper).Attack(keeper))
 				{
 					System.Console.WriteLine(keeper.Name() + " failed to block the goal!");
-                    Score(chase, 10);
+					Score(chase, 10);
 					return true;
-				}else 
-				return false;
+				}
+				else
+					return false;
 			}
 			if (chance == 4)//opposing chaser fouls
 			{
@@ -319,6 +321,11 @@ namespace QSim
 				}
 				return false;
 			}
+			if (chance == 5)//friendly beater comes to help
+			{
+				Beater defendingBeater = GetBeater(keeper, true);
+				return defendingBeater.BlockGoal();
+			}
 			return false;
 		}
 
@@ -328,18 +335,18 @@ namespace QSim
 		{
 			int Seed = (int)DateTime.Now.Ticks;
 			Random rnd = new Random(Seed);
-			int chance = rnd.Next(22);
+			int chance = rnd.Next(25);
 
 			if (chance < 3)//chaser interrupt
 			{
 				Chaser opposingChaser = GetChaser(null, chase.GetKey().Substring(0, 2), true);
 				return opposingChaser.Interception(chase);
 			}
-			if (chance >= 3 && chance < 6)//beater interrupt
+			if (chance >= 3 && chance < 7)//beater interrupt
 			{
 				return GetBeater(chase).Attack(chase);
 			}
-			if (chance >= 6 && chance < 8)//opposing chaser fouls
+			if (chance >= 7 && chance < 9)//opposing chaser fouls
 			{
 				Chaser opposingChaser = GetChaser(null, chase.GetKey().Substring(0, 2), true);
 				if (opposingChaser.PlaysDirty() && Fouler.FoulVersus(opposingChaser, chase))
@@ -350,7 +357,7 @@ namespace QSim
 				}
 				return false;
 			}
-			if (chance == 9)//opposing beaters foul
+			if (chance == 10)//opposing beaters foul
 			{
 				Beater beater = GetBeater(chase);
 				if (beater.PlaysDirty() && Fouler.FoulVersus(beater, chase))
@@ -487,7 +494,7 @@ namespace QSim
 		{
 			int Seed = (int)DateTime.Now.Ticks;
 			Random rnd = new Random(Seed);
-			int seekChance = rnd.Next(7);
+			int seekChance = rnd.Next(13);
 			bool ready = CompareCounts();
 			bool head = HeadToHeadCount();
 			int foulChance = rnd.Next(4);

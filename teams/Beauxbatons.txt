@@ -1,0 +1,57 @@
+﻿Beauxbatons
+Reginald Elric
+8
+9
+9
+7
+7
+1
+false
+Sirene Guilliot
+5
+9
+6
+10
+8
+1
+false
+Adalie Leandres
+9
+10
+8
+6
+8
+1
+true
+Zara Asturias
+9
+9
+8
+6
+8
+1
+true
+Julien Beauregard
+7
+6
+8
+7
+9
+1
+false
+Camille D'Aurevelle
+8
+8
+10
+8
+9
+1
+true
+Tomas Vicente
+9
+7
+9
+8
+7
+1
+true
